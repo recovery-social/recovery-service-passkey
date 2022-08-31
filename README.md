@@ -6,7 +6,7 @@
 
 ## Contract Docs
 
-[https://docs.recovery.social/docs/lsp11recoveryservice](https://docs.recovery.social/docs/lsp11recoveryservice)
+[https://docs.recovery.social/docs/standards/lsp11recoveryservice](https://docs.recovery.social/docs/standards/lsp11recoveryservice)
 
 ## Run the Program
 
