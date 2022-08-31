@@ -1,0 +1,42 @@
+{
+  "name": "lsp11-recovery-service-passkey",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc -p tsconfig.json; npm run copy-files",
+    "copy-files": "cp -r ./src/assets/ ./dist/assets",
+    "start": "node dist/index.js",
+    "dev": "concurrently \"npx tsc -p tsconfig.json --watch\" \"nodemon -q  dist/index.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npm run build && gcloud app deploy --project lsp11-recovery-service-passkey"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.7.13",
+    "concurrently": "^7.3.0",
+    "nodemon": "^2.0.19",
+    "types-ethereumjs-util": "^0.0.8",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@erc725/erc725.js": "^0.14.4",
+    "@erc725/smart-contracts": "^3.1.2",
+    "@fastify/cors": "^8.1.0",
+    "@fastify/env": "^4.1.0",
+    "@fastify/static": "^6.5.0",
+    "@fastify/view": "^7.1.0",
+    "@simplewebauthn/server": "^6.2.0",
+    "ejs": "^3.1.8",
+    "ethereumjs-utils": "^5.2.5",
+    "ethers": "^5.7.0",
+    "fastify": "^4.5.2",
+    "firebase-admin": "^11.0.1",
+    "web3": "^1.7.5"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}

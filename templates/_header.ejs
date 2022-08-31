@@ -1,0 +1,142 @@
+<head>
+  <title>passkey.recovery.social</title>
+  <link rel="icon" type="image/x-icon" href="/assets/logo_small.png" />
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.5/web3.min.js"
+    integrity="sha512-/T7YwzOsNeoNkuTfYKXn3CrJCGc5cnC8T4QW46Hy+3Xjdjrxzokmbx8M8Xavjq1K7dN4958kIRGy4J03VRIlSg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <link
+    href="https://cdn.jsdelivr.net/npm/daisyui@2.24.0/dist/full.css"
+    rel="stylesheet"
+    type="text/css"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      daisyui: {
+        themes: [
+          {
+            auth: {
+              primary: "#f38b90",
+              secondary: "#6199ff",
+              accent: "#FFB400",
+              neutral: "#3D4451",
+              "base-100": "#FFFFFF",
+              info: "#3ABFF8",
+              success: "#36D399",
+              warning: "#FBBD23",
+              error: "#F87272",
+            },
+          },
+        ],
+      },
+    };
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      html,
+      body {
+        height: 100%;
+        padding: 0;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        @apply font-medium mb-2;
+      }
+      h1 {
+        @apply text-3xl font-bold;
+      }
+      h2 {
+        @apply text-2xl;
+      }
+      h3 {
+        @apply text-xl;
+      }
+      h4 {
+        @apply text-lg;
+      }
+      h5 {
+        @apply text-lg;
+      }
+      h6 {
+        @apply text-base;
+      }
+      p {
+        @apply font-normal text-base mb-4;
+      }
+
+      .navbar-container {
+        @apply p-4 fixed w-full;
+      }
+      .navbar {
+        @apply shadow-xl rounded-xl;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #f38b90 0%, #6199ff 100%);
+        @apply text-white border-none;
+      }
+
+      .inner-stage {
+        @apply flex flex-col justify-between items-center text-center h-full;
+      }
+
+      .background {
+        background: #cdf0ea;
+        @apply h-full w-full;
+        @apply md:flex justify-center items-center;
+      }
+      .stage {
+        @apply relative bg-white mx-auto rounded-3xl shadow-2xl;
+        @apply md:p-8 p-4 md:py-16 pt-8;
+      }
+
+      @media screen and (min-width: 768px) {
+        .stage {
+          width: 768px;
+          height: 768px;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .background {
+          padding-top: 33%;
+        }
+
+        .stage {
+          @apply w-full h-full;
+          @apply rounded-b-none;
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background">
+    <img
+      routerLink="/"
+      src="/assets/logo.png"
+      alt="logo"
+      class="w-12 absolute left-1/2 -translate-x-1/2 top-4"
+    />
+    <div class="stage overflow-y-auto">

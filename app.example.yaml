@@ -1,0 +1,12 @@
+runtime: nodejs16
+env_variables: 
+    FIREBASE_type: "service_account"
+    FIREBASE_project_id: "xxxxxxxx"
+    FIREBASE_private_key_id: "xxxxxxxx"
+    FIREBASE_private_key: "xxxxxxxx"
+    FIREBASE_client_email: "xxxxxxxx"
+    FIREBASE_client_id: "xxxxxxxx"
+    FIREBASE_auth_uri: "xxxxxxxx"
+    FIREBASE_token_uri: "xxxxxxxx"
+    FIREBASE_auth_provider_x509_cert_url: "xxxxxxxx"
+    FIREBASE_client_x509_cert_url: "xxxxxxxx"

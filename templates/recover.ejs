@@ -1,0 +1,131 @@
+<%- include('_header'); -%>
+<div class="inner-stage">
+  <div>
+    <h1>Recover Profile</h1>
+    <p class="text-sm"><%= LSP11ContractAddress; %></p>
+  </div>
+
+  <i id="loading" class="fas fa-2x fa-circle-notch fa-spin hidden"></i>
+
+  <button class="btn btn-primary" onclick="verify()">Login</button>
+  <p id="success"></p>
+  <p id="error" class="text-danger"></p>
+</div>
+
+<script>
+  const { startAuthentication } = SimpleWebAuthnBrowser;
+
+  // <button>
+  const elemBegin = document.getElementById("btnBegin");
+  // <span>/<p>/etc...
+  const elemSuccess = document.getElementById("success");
+  // <span>/<p>/etc...
+  const elemError = document.getElementById("error");
+
+  async function verify() {
+    elemSuccess.innerHTML = "";
+    elemError.innerHTML = "";
+
+    // GET authentication options from the endpoint that calls
+    // @simplewebauthn/server -> generateAuthenticationOptions()
+    const resp = await fetch("/api/recover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        LSP11ContractAddress: "<%= LSP11ContractAddress; %>",
+        newOwner: "<%= newOwner; %>",
+      }),
+    });
+
+    let asseResp;
+    try {
+      // Pass the options to the authenticator and wait for a response
+      asseResp = await startAuthentication(await resp.json());
+    } catch (error) {
+      // Some basic error handling
+      elemError.innerText = error;
+      throw error;
+    }
+
+    // POST the response to the endpoint that calls
+    // @simplewebauthn/server -> verifyAuthenticationResponse()
+    const verificationResp = await fetch("/api/recover/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        body: asseResp,
+        LSP11ContractAddress: "<%= LSP11ContractAddress; %>",
+        newOwner: "<%= newOwner; %>",
+      }),
+    });
+
+    // Wait for the results of verification
+    const verificationJSON = await verificationResp.json();
+
+    // Show UI appropriate for the `verified` status
+    if (verificationJSON && verificationJSON.ticket) {
+      elemSuccess.innerHTML = "Success!";
+      window.opener.postMessage(
+        { lsp11RecoveryService: { success: true, data: verificationJSON } },
+        "*"
+      );
+    } else {
+      elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
+        verificationJSON
+      )}</pre>`;
+    }
+
+    // var token = document.getElementById("token").value;
+    // console.log("token", token);
+
+    // showLoading(true);
+
+    // let data = {
+    //   LSP11ContractAddress: "<%= LSP11ContractAddress; %>",
+    //   newOwner: "<%= newOwner; %>",
+    //   token,
+    // };
+
+    // fetch("/api/recover", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(data),
+    // }).then((res) => {
+    //   showLoading(false);
+    //   console.log("Request complete! response:", res);
+    //   res.json().then((data) => {
+    //     console.log("data", data);
+    //     showError();
+
+    //     if (res.status === 200) {
+    //       window.opener.postMessage(
+    //         { lsp11RecoveryService: { success: true, data } },
+    //         "*"
+    //       );
+    //     } else {
+    //       showError(data.error);
+    //     }
+    //   });
+    // });
+    // var url = "/recover/" + address + "/" + token;
+    // window.location.href = url;
+  }
+
+  function showLoading(yes) {
+    const loading = document.getElementById("loading");
+    if (yes) {
+      loading.style.display = "block";
+    } else {
+      loading.style.display = "none";
+    }
+  }
+
+  function showError(text) {
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.innerHTML = text ?? "";
+  }
+</script>
+
+<%- include('_footer'); -%>

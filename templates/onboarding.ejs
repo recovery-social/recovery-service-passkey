@@ -1,0 +1,145 @@
+<%- include('_header'); -%>
+
+<div class="inner-stage">
+  <div>
+    <h1>Welcome to our Recovery Service</h1>
+    <p>
+      powered by
+      <a href="https:/recovery.social" target="_blank">recovery.social</a>
+    </p>
+    <p>
+      This Service uses the Webauthn Standard to identify you.<br />All you need
+      is your computer and a modern browser. We will handle everything else.
+      It's pretty easy
+    </p>
+    <p class="text-sm"><%= LSP11ContractAddress; %></p>
+  </div>
+
+  <i id="loading" class="fas fa-2x fa-circle-notch fa-spin hidden"></i>
+
+  <p id="success"></p>
+  <p id="error" class="text-error"></p>
+
+  <button class="btn btn-primary" id="btnBegin" onclick="beginRegistration()">
+    Connect your Wallet first and sign the message
+  </button>
+
+</div>
+
+<script>
+  const ethereum = window.ethereum;
+  const web3 = new Web3(ethereum);
+
+  const { startRegistration } = SimpleWebAuthnBrowser;
+
+  const elemSuccess = document.getElementById("success");
+  const elemError = document.getElementById("error");
+
+  async function beginRegistration() {
+    showLoading(true);
+
+    const address = await ethereum.request({ method: "eth_requestAccounts" });
+    console.log("addresses", address);
+    console.log("Account connected: ", address[0]); // Account address that you had imported
+
+    console.log("<%= LSP11ContractAddress; %>");
+
+    const LSP11ContractAddress = "<%= LSP11ContractAddress; %>";
+
+    const now = new Date();
+    const seconds = Math.round(now.getSeconds() / 10) * 10;
+    const prefix =
+      "To sign in, please sign this message to confirm your identity. ";
+    const message =
+      prefix +
+      new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes(),
+        seconds
+      )
+        .getTime()
+        .toString();
+
+    const signature = await web3.eth.sign(message, address[0]);
+    console.log(message, signature);
+
+    const signingAddress = web3.eth.accounts.recover(
+      message,
+      signature.signature
+    );
+
+    console.log("signingAddress", signingAddress);
+
+    // Reset success/error messages
+    elemSuccess.innerHTML = "";
+    elemError.innerHTML = "";
+
+    const resp = await fetch("/api/onboarding/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        LSP11ContractAddress: "<%= LSP11ContractAddress; %>",
+        signature: signature,
+      }),
+    });
+
+    const respJson = await resp.json();
+    if (resp.status !== 200) {
+      elemError.innerText = "Error: " + respJson.error;
+      showLoading(false);
+      return;
+    }
+
+    let attResp;
+    try {
+      attResp = await startRegistration(respJson);
+    } catch (error) {
+      if (error.name === "InvalidStateError") {
+        elemError.innerText =
+          "Error: Authenticator was probably already registered by user";
+      } else {
+        elemError.innerText = error;
+      }
+      console.log(error);
+      return;
+    }
+
+    const verificationResp = await fetch("/api/onboarding/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        LSP11ContractAddress: "<%= LSP11ContractAddress; %>",
+        body: attResp,
+      }),
+    });
+
+    const verificationJSON = await verificationResp.json();
+
+    if (verificationJSON.verified) {
+      console.log("posted");
+      window.opener.postMessage(
+        { lsp11RecoveryService: { success: true, data: verificationJSON } },
+        "*"
+      );
+    } else {
+      const errorMessage = document.getElementById("error-message");
+      errorMessage.innerHTML = data.error;
+    }
+  }
+
+  function showLoading(yes) {
+    const loading = document.getElementById("loading");
+    if (yes) {
+      loading.style.display = "block";
+    } else {
+      loading.style.display = "none";
+    }
+  }
+</script>
+
+<%- include('_footer'); -%>
